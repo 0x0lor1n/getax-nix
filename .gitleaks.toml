@@ -1,5 +1,4 @@
-# Default rules plus home paths; the rule naming real identities lives in
-# ~/.config/gitleaks/personal.toml, because a regex listing them is the leak.
+# Identity rules live in ~/.config/gitleaks/personal.toml: a regex listing them is the leak.
 [extend]
 useDefault = true
 

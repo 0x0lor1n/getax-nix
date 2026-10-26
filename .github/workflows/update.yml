@@ -1,0 +1,41 @@
+name: update
+
+on:
+  schedule:
+    - cron: "17 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v31
+      - run: nix run .#update
+      - id: diff
+        run: |
+          if git diff --quiet releases.json; then
+            echo "changed=false" >>"$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >>"$GITHUB_OUTPUT"
+            jq -r 'to_entries | map("\(.key) \(.value.version)") | join(", ")' releases.json |
+              sed 's/^/versions=/' >>"$GITHUB_OUTPUT"
+          fi
+      # A PR opened with GITHUB_TOKEN triggers no workflows, so the build is checked here.
+      - if: steps.diff.outputs.changed == 'true'
+        run: |
+          for p in $(nix eval --json .#packages.x86_64-linux --apply 'ps: builtins.filter (n: builtins.match "getax-[0-9]+" n != null) (builtins.attrNames ps)' | jq -r '.[]'); do
+            nix build --no-link ".#$p"
+          done
+      - if: steps.diff.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: update/releases
+          commit-message: "releases: ${{ steps.diff.outputs.versions }}"
+          title: "releases: ${{ steps.diff.outputs.versions }}"
+          body: ""
+          delete-branch: true
