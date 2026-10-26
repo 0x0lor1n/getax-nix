@@ -18,7 +18,7 @@ GeTax writes declarations, autosaves and logs to `$GETAX_HOME/GeTax<year>`,
 
 ```sh
 git clone https://github.com/0x0lor1n/getax-nix && cd getax-nix
-echo 'use flake' > .envrc && direnv allow   # or: nix develop
+direnv allow                                # or: nix develop
 getax-2025                                  # data lands in ./data (git-ignored)
 ```
 
