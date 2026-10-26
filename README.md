@@ -22,6 +22,22 @@ direnv allow                                # or: nix develop
 getax-2025                                  # data lands in ./data (git-ignored)
 ```
 
+### Ephemeral home (impermanence)
+
+With the default `GETAX_HOME=$HOME` a wiped home takes the declaration with
+it. Either set `GETAX_HOME` to persisted storage (e.g.
+`home.sessionVariables.GETAX_HOME = "/persist/tax";`), or persist what GeTax
+writes under it:
+
+```nix
+environment.persistence."/persist".users.<name>.directories = [
+  "GeTax2025"   # declarations, autosaves, filed-copy PDFs (pp/depot); one dir per year
+  "dvbern-tax"  # table layout settings
+];
+```
+
+`.swt` (unpacked native libs) is a cache and can stay ephemeral.
+
 ## Updates
 
 Each tax year is a separate GeTax release; `releases.json` pins one tarball
