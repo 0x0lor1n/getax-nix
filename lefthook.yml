@@ -1,3 +1,6 @@
+# Sequential: parallel `stage_fixed` jobs fight over .git/index.lock.
+glob_matcher: doublestar
+
 pre-commit:
   jobs:
     - name: gitleaks
@@ -10,3 +13,30 @@ pre-commit:
         else
           echo "gitleaks-personal: $f missing, identity check skipped" >&2
         fi
+
+    - name: nixfmt
+      glob: "**/*.nix"
+      stage_fixed: true
+      run: nixfmt {staged_files}
+    - name: deadnix
+      glob: "**/*.nix"
+      run: deadnix --fail {staged_files}
+    - name: statix
+      glob: "**/*.nix"
+      run: statix check
+
+    # update.sh has no shebang: writeShellApplication supplies it.
+    - name: shfmt
+      glob: "**/*.sh"
+      stage_fixed: true
+      run: shfmt -w -i 2 -ln bash {staged_files}
+    - name: shellcheck
+      glob: "**/*.sh"
+      run: shellcheck -s bash {staged_files}
+
+    - name: actionlint
+      glob: ".github/workflows/*.yml"
+      run: actionlint {staged_files}
+
+    - name: nix flake check
+      run: nix flake check

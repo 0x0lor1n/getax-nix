@@ -133,6 +133,12 @@
         packages = lib.attrValues getax ++ [
           pkgs.lefthook
           pkgs.gitleaks
+          pkgs.nixfmt
+          pkgs.deadnix
+          pkgs.statix
+          pkgs.shfmt
+          pkgs.shellcheck
+          pkgs.actionlint
         ];
         shellHook = ''
           export GETAX_HOME="$PWD/data"

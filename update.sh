@@ -1,4 +1,7 @@
-[ -f releases.json ] || { echo "run from the repo root" >&2; exit 1; }
+[ -f releases.json ] || {
+  echo "run from the repo root" >&2
+  exit 1
+}
 
 url() { echo "https://www.getax.ch/getaxpp/$1/getax$1.tar.gz"; }
 
@@ -15,7 +18,10 @@ pin() {
   hash=$(jq -r .hash <<<"$json")
   version=$(tar xzf "$path" "getax-pp-$year/version.xml" -O |
     sed -n 's:.*<version>\(.*\)</version>.*:\1:p')
-  [ -n "$version" ] || { echo "getax $year: no <version> in version.xml" >&2; exit 1; }
+  [ -n "$version" ] || {
+    echo "getax $year: no <version> in version.xml" >&2
+    exit 1
+  }
   jq -S --arg y "$year" --arg v "$version" --arg h "$hash" --arg lm "$lm" \
     '.[$y] = {version: $v, hash: $h, lastModified: $lm}' releases.json >releases.json.new
   mv releases.json.new releases.json
@@ -25,7 +31,10 @@ pin() {
 if [ $# -gt 0 ]; then
   for year in "$@"; do
     lm=$(last_modified "$year")
-    [ -n "$lm" ] || { echo "getax $year: not published" >&2; exit 1; }
+    [ -n "$lm" ] || {
+      echo "getax $year: not published" >&2
+      exit 1
+    }
     pin "$year" "$lm"
   done
   exit 0
