@@ -1,0 +1,12 @@
+pre-commit:
+  jobs:
+    - name: gitleaks
+      run: gitleaks git --staged --no-banner --redact --config .gitleaks.toml
+    - name: gitleaks-personal
+      run: |
+        f="${XDG_CONFIG_HOME:-$HOME/.config}/gitleaks/personal.toml"
+        if [ -f "$f" ]; then
+          gitleaks git --staged --no-banner --redact --config "$f"
+        else
+          echo "gitleaks-personal: $f missing, identity check skipped" >&2
+        fi

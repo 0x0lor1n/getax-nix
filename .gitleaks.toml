@@ -1,0 +1,9 @@
+# Default rules plus home paths; the rule naming real identities lives in
+# ~/.config/gitleaks/personal.toml, because a regex listing them is the leak.
+[extend]
+useDefault = true
+
+[[rules]]
+id = "home-path"
+description = "Absolute home directory paths"
+regex = '''/home/[a-z][a-z0-9_.@-]+/'''
